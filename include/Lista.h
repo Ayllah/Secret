@@ -1,6 +1,9 @@
 #ifndef LISTA_H					
 #define LISTA_H
 
+#include <iostream>
+#include <fstream>
+
 //Estrutura para armazenar e tratar registros
 
 class Registro {
@@ -13,11 +16,11 @@ class Registro {
 //Estrutura para armazenar e tratar as chaves primarias
 
 class ChavesPrimarias {
-	public: char chavePrim[]; 
+	public: std::string chavePrim; 
 			int RRN;
 			char MarcadorAtivo;
 			ChavesPrimarias *prox;
-}
+};
 
 //Estrutura para armazenar e tratar as listas invertidas
 //Para cada no da lista de chaves secundarias sera criada
@@ -28,7 +31,7 @@ class ListaInvertida {
 	public : ChavesPrimarias *ptr;
 			 ListaInvertida *prox;
 	
-}
+};
 
 //Estrutura para armazenar e tratar as chaves secundarias
 //Cada no cria uma lista invertida
@@ -36,9 +39,9 @@ class ListaInvertida {
 class ChavesSecundarias {
 	public : char chaveSec[];
 			 ListaInvertida *Inicio;
-			 ListaInvertido *Fim;
+			 ListaInvertida *Fim;
 			 ChavesSecundarias *prox;
-}
+};
 
 class Lista {
 	public : ChavesPrimarias *ChavPrimInicio, *ChavPrimFim;
@@ -49,14 +52,18 @@ class Lista {
 			 char Busca = 0; // 0: Busca sem exclusao ; 1: Busca com exclusao
 			 void CriaRegistro(); 
 			 ChavesPrimarias* IncluirRegistroChavP(char *chavePrim, int RRN, ChavesPrimarias **Inicio, ChavesPrimarias **Fim);
-			 void IncluirRegistroInvertida(ChavesPrimarias *ptr, ListaInvertida **Inicio, ListaInvertida **Fim);
-			 void IncluirRegistroChavS(char *chaveSec, ChavesPrimarias *ptr, ChavesSecundarias **Inicio, ChavesSecundarias **Fim);
-			 int TamanhoListaSec();
-			 
+			 void IncluirRegistroInvertida();
 			 void ExcluirRegistro();
 			 void AtualizarRegistro();
 			 void Intercalacao();
 
+};
+
+class Arquivos{
+public:
+	void ArquivoPrimario();
+private:
+	void LerListaOriginal(std::istream& Lista, std::ostream& indicelista, ChavesPrimarias **no);
 };
 
  
