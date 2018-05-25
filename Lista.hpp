@@ -49,7 +49,10 @@ class Lista {
 			 char Busca = 0; // 0: Busca sem exclusao ; 1: Busca com exclusao
 			 void CriaRegistro(); 
 			 ChavesPrimarias* IncluirRegistroChavP(char *chavePrim, int RRN, ChavesPrimarias **Inicio, ChavesPrimarias **Fim);
-			 void IncluirRegistroInvertida();
+			 void IncluirRegistroInvertida(ChavesPrimarias *ptr, ListaInvertida **Inicio, ListaInvertida **Fim);
+			 void IncluirRegistroChavS(char *chaveSec, ChavesPrimarias *ptr, ChavesSecundarias **Inicio, ChavesSecundarias **Fim);
+			 int TamanhoListaSec();
+			 
 			 void ExcluirRegistro();
 			 void AtualizarRegistro();
 			 void Intercalacao();
