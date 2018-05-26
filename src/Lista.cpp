@@ -1,21 +1,22 @@
-#include "Lista.hpp"
-#include <iostream>
+#include "Lista.h"
 
+
+/*
 //Cria arquivos quando nao existem
 
 void Lista :: CriaRegistro(){
-	FILE *arquivo;
-	arquivo = fopen("lista1.txt", "rb");
-	if(!arquivo){
-		arquivo = fopen("lista1.txt", "wb");
-		fclose(arquivo);
-	}
-	arquivo = fopen("lista2.txt", "rb");
-	if(!arquivo){
-		arquivo = fopen("lista2.txt", "wb");
-		fprintf(arquivo, "i = n");
-		fclose(arquivo);
-	}
+   FILE *arquivo;
+   arquivo = fopen("lista1.txt", "rb");
+   if(!arquivo){
+      arquivo = fopen("lista1.txt", "wb");
+      fclose(arquivo);
+   }
+   arquivo = fopen("lista2.txt", "rb");
+   if(!arquivo){
+      arquivo = fopen("lista2.txt", "wb");
+      fprintf(arquivo, "i = n");
+      fclose(arquivo);
+   }
 }
 
 //Insere as chaves primarias nos indices de forma ordenada.
@@ -23,97 +24,97 @@ void Lista :: CriaRegistro(){
 //a funcao ira retornar o endereco do no em que esta alocada a chave
 
 ChavesPrimarias* Lista :: IncluirRegistroChavP(char *chavePrim, int RRN, ChavesPrimarias **Inicio, ChavesPrimarias **Fim){
-	ChavesPrimarias *no, *iterador, *anterior;
-	no = new(ChavesPrimarias);
-	strcpy(no->chavePrim, chavePrim);
-	no->RRN = RRN;
-	no->MarcadorAtivo = 1;
-	no->prox = NULL;
+   ChavesPrimarias *no, *iterador, *anterior;
+   no = new(ChavesPrimarias);
+   strcpy(no->chavePrim, chavePrim);
+   no->RRN = RRN;
+   no->MarcadorAtivo = 1;
+   no->prox = NULL;
 
-	//Verifica se a lista esta vazia
-	if (!*Inicio) {
+   //Verifica se a lista esta vazia
+   if (!*Inicio) {
        *Inicio = no;
        *Fim = no;
    }
    else {
 
-   		iterador = *Inicio;
-   		anterior = *Inicio;
+         iterador = *Inicio;
+         anterior = *Inicio;
 
-   		while (iterador) {
-   			if (strcmp(iterador->chavePrim, chavePrim) == 0) {
-   				return iterador;
-   			}
-   			if (strcmp(iterador->chavePrim, chavePrim) >= 0) {
-   				break;
-   			}
-   			anterior = iterador;
-   			iterador = iterador->prox;
-   		}
+         while (iterador) {
+            if (strcmp(iterador->chavePrim, chavePrim) == 0) {
+               return iterador;
+            }
+            if (strcmp(iterador->chavePrim, chavePrim) >= 0) {
+               break;
+            }
+            anterior = iterador;
+            iterador = iterador->prox;
+         }
 
-   		if (iterador==NULL) {
-   			(*Fim)->prox = no;
-   			*Fim = no;
-   		}
-   		else if (iterador == anterior) {
-   			no->prox = iterador;
-   			*Inicio = no;
-   		}
-   		else {
-   			anterior->prox = no;
-   			no->prox = iterador;
+         if (iterador==NULL) {
+            (*Fim)->prox = no;
+            *Fim = no;
+         }
+         else if (iterador == anterior) {
+            no->prox = iterador;
+            *Inicio = no;
+         }
+         else {
+            anterior->prox = no;
+            no->prox = iterador;
 
-   		}
+         }
    }
-	return node;
+   return node;
 }
 
 //Insere os elementos na lista invertida de forma ordenada
 
 void IncluirRegistroInvertida(ChavesPrimarias *ptr, ListaInvertida **Inicio, ListaInvertida **Fim){
-	ListaInvertida *no, *iterador, *anterior;
-	no = new (ListaInvertida);
-	no->ptr = ptr;
-	no->prox = NULL;
+   ListaInvertida *no, *iterador, *anterior;
+   no = new (ListaInvertida);
+   no->ptr = ptr;
+   no->prox = NULL;
 
-	//Verifica se a lista esta vazia
-	if (!*Inicio) {
-    	*Inicio = no;
-       	*Fim = no;
+   //Verifica se a lista esta vazia
+   if (!*Inicio) {
+      *Inicio = no;
+         *Fim = no;
     }
     else {
 
-    	iterador = *Inicio;
-    	ante = *Inicio;
+      iterador = *Inicio;
+      ante = *Inicio;
 
-    	while (iterador) {
-        	if (strcmp(iterador->pk->key, pk->key)>=0) {
-            	break;
-        	}
-        	ante = iterador;
-        	iterador = iterador->prox;
-    	}
+      while (iterador) {
+         if (strcmp(iterador->pk->key, pk->key)>=0) {
+               break;
+         }
+         ante = iterador;
+         iterador = iterador->prox;
+      }
 
-    	if (iterador==NULL) {
-        	(*Fim)->prox = no;
-        	*Fim = no;
-    	}
-    	else if (iterador==ante) {
-        	no->prox = iterador;
-        	*Inicio = no;
-    	}
-    	else {
-        	ante->prox = no;
-        	no->prox = iterador;
+      if (iterador==NULL) {
+         (*Fim)->prox = no;
+         *Fim = no;
+      }
+      else if (iterador==ante) {
+         no->prox = iterador;
+         *Inicio = no;
+      }
+      else {
+         ante->prox = no;
+         no->prox = iterador;
 
-    	}
- 	}
+      }
+   }
 }
 
 //Insere as chaves secundarias nos indices de forma ordenada
 
 void IncluirRegistroChavS(char *chaveSec, ChavesPrimarias *ptr, ChavesSecundarias **Inicio, ChavesSecundarias **Fim){
-	ChavesSecundarias *no, *iterador, *anterior;
+   ChavesSecundarias *no, *iterador, *anterior;
     no = new (ChavesSecundarias);
     strcpy(no->chaveSec, chaveSec);
     no->prox = NULL;
@@ -126,47 +127,47 @@ void IncluirRegistroChavS(char *chaveSec, ChavesPrimarias *ptr, ChavesSecundaria
        *Inicio = no;
        *Fim = no;
 
-    	// Inserindo elementos na lista invertida
-    	IncluirRegistroInvertida(ptr, &((*Inicio)->Inicio), &((*Inicio)->Fim));
-   		return;
+      // Inserindo elementos na lista invertida
+      IncluirRegistroInvertida(ptr, &((*Inicio)->Inicio), &((*Inicio)->Fim));
+         return;
     }
 
     else {
-    	iterador = *Incio;
-    	anterior = *Inicio;
+      iterador = *Incio;
+      anterior = *Inicio;
 
-    	while (iterador) {
-        	if (strcmp(iterador->chaveSec, chaveSec) == 0) {
-           		free(no);
+      while (iterador) {
+         if (strcmp(iterador->chaveSec, chaveSec) == 0) {
+               free(no);
 
-            	//Inserindo elementos na lista invertida
-            	IncluirRegistroInvertida(ptr, &(iterador->Incio), &(iterador->Fim));
-            	return;
-        	}
+               //Inserindo elementos na lista invertida
+               IncluirRegistroInvertida(ptr, &(iterador->Incio), &(iterador->Fim));
+               return;
+         }
 
-        	if (strcmp(iterador->chaveSec, chaveSec) > 0) {
-        		break;
-       		}
-        	anterior = iterador;
-        	iterador = iterador->prox;
-    	}
+         if (strcmp(iterador->chaveSec, chaveSec) > 0) {
+            break;
+            }
+         anterior = iterador;
+         iterador = iterador->prox;
+      }
 
-    	if (iterador == NULL) {
-        	(*Fim)->prox = no;
-        	*Fim = no;
-    	}
-    	else if (iterador == anterior) {
-        	no->prox = iterador;
-        	*Incio = no;
-    	}
-    	else {
-        	anterior->prox = no;
-        	no->prox = iterador;
+      if (iterador == NULL) {
+         (*Fim)->prox = no;
+         *Fim = no;
+      }
+      else if (iterador == anterior) {
+         no->prox = iterador;
+         *Incio = no;
+      }
+      else {
+         anterior->prox = no;
+         no->prox = iterador;
 
-    	}
-   		//Inserindo elementos na lista invertida
-    	IncluirRegistroInvertida(ptr, &(no->Incio), &(no->Fim));
- 	}
+      }
+         //Inserindo elementos na lista invertida
+      IncluirRegistroInvertida(ptr, &(no->Incio), &(no->Fim));
+   }
 }
 
 //Retorna o tamanho da lista primaria
@@ -187,14 +188,14 @@ int TamanhoListaPrim(ChavesPrimarias *Inicio) {
 //Retorna o tamanho da lista secundaria
 
 int TamanhoListaSec(ChavesSecundarias *Inicio){
-	int i = 0;
-	ChavesSecundarias *iterador = Inicio;
-	while(iterador) {
-	    i++;
-	    iterador = iterador->prox;
-	}
+   int i = 0;
+   ChavesSecundarias *iterador = Inicio;
+   while(iterador) {
+       i++;
+       iterador = iterador->prox;
+   }
 
-	return i;
+   return i;
 }
 
 //Percorre o arquivo com base no RRN e adiciona uma marca
@@ -256,4 +257,89 @@ void AtualizarRegistro(){
   tamanhoSecNOME = tamanhoVetor;
   vetorSecMATRIC = ListaParaVetorSec(ChavSecNOMEInicio);
   tamanhoSecMATRIC = tamanhoVetor;
+}
+*/
+void Arquivos::ArquivoPrimario(){
+   std::ifstream Lista1("../res/lista1.txt");
+   std::ifstream Lista2("../res/lista2.txt");
+   std::ofstream indicelistaP1("../res/indicelista1.ind");
+   std::ofstream indicelistaP2("../res/indicelista2.ind");
+
+   std::ofstream indicelistaS1("../res/listaSecundaria1.ind");
+   std::ofstream indicelistaS2("../res/listaSecundaria2.ind");   
+
+   // Ler Lista1 e cria arquivo de indices primarios: indicelista1
+   ListaRegistros* listaPrimarios1;
+   ListaInvertida* listaInvertida1;
+   LerListaOriginal(Lista1, indicelistaP1, indicelistaS1, &listaPrimarios1->Inicio, &listaInvertida1->Inicio);
+
+   // Ler Lista 2 e cria arquivo de indices primarios: indicelista2
+   /*ListaRegistros* listaPrimarios2;
+   ListaInvertida* listaInvertida2;
+   LerListaOriginal(Lista2, indicelistaP2, indicelistaS2, &listaPrimarios2->Inicio, &listaInvertida2->Inicio);
+   */
+   Lista1.close();
+   Lista2.close();
+   indicelistaP1.close();
+   indicelistaP2.close();
+   indicelistaS1.close();
+   indicelistaS2.close();   
+}
+
+void Arquivos::InserirPrimario(ChavesPrimarias **no, std::string chave, unsigned RRN, std::ostream& indicelistaP){
+   (*no) = new(ChavesPrimarias);
+   (*no)->chavePrim = chave;
+   (*no)->RRN = RRN;
+   (*no)->MarcadorAtivo = 1;
+   (*no)->prox = NULL;
+   indicelistaP << chave << "|" << (*no)->RRN << std::endl; 
+}
+
+void Arquivos::InserirSecundario(ChavesSecundarias **no, std::string curso, unsigned RRN, std::ostream& indicelistaS){
+   (*no) = new(ChavesSecundarias);
+   (*no)->curso = curso;
+   (*no)->prox = NULL;
+   (*no)->referencia = RRN;
+   indicelistaS << curso << " " << (*no)->referencia << std::endl;   
+}
+
+void Arquivos::LerListaOriginal(std::istream& Lista, std::ostream& indicelistaP, std::ostream& indicelistaS,
+                              ChavesPrimarias **noP, ChavesSecundarias **noS){
+   if(!Lista.eof()){
+      std::string linha, chave, curso;
+      
+      getline(Lista, linha);
+
+      unsigned contador=0, espacos=0;
+
+      while( (chave.size() < 30) && (espacos <= 4) ){
+         if( !isspace(linha[contador]) ){
+            chave.push_back(linha[contador]);
+         }
+         else espacos++;
+         contador++;
+      }
+
+      std::string espaco = " ";
+      if(linha.size() != 0){
+
+         curso.push_back(linha[52]);
+         curso.push_back(linha[53]);         
+
+         if(chave.size() < 30){
+            while(chave.size() < 30){
+               chave.push_back(espaco[0]);
+            }
+         }         
+         unsigned RRN = 2*indicelistaP.tellp();
+         InserirPrimario(&(*noP), chave, RRN, indicelistaP);
+         InserirSecundario(&(*noS), curso, RRN, indicelistaS);
+
+         indicelistaP << chave << "|" << (*noP)->RRN << std::endl;
+
+         std::cout << "chave: " << chave << " RNN: " << (*noP)->RRN << " " << curso << std::endl;
+      }
+
+      LerListaOriginal(Lista, indicelistaP, indicelistaS, &((*noP)->prox), &((*noS)->prox));
+   }
 }

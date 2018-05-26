@@ -4,23 +4,28 @@
 #include <iostream>
 #include <fstream>
 
-//Estrutura para armazenar e tratar registros
-
-class Registro {
-    public : char MATRIC[];
-    		 char NOME[];
-         
-             
-};
-
 //Estrutura para armazenar e tratar as chaves primarias
 
-class ChavesPrimarias {
-	public: std::string chavePrim; 
-			int RRN;
-			char MarcadorAtivo;
-			ChavesPrimarias *prox;
+typedef struct ChavesP {
+	std::string chavePrim; 
+	int RRN;
+	char MarcadorAtivo;
+	struct ChavesP *prox;
+}ChavesPrimarias;
+
+class ListaRegistros{
+public:
+	ChavesPrimarias* Inicio;
 };
+
+//Estrutura para armazenar e tratar as chaves secundarias
+//Cada no cria uma lista invertida
+
+typedef struct ChavesS {
+	std::string curso;
+	unsigned referencia;
+	struct ChavesS* prox;
+}ChavesSecundarias;
 
 //Estrutura para armazenar e tratar as listas invertidas
 //Para cada no da lista de chaves secundarias sera criada
@@ -28,19 +33,8 @@ class ChavesPrimarias {
 //nos da lista de chave primaria
 
 class ListaInvertida {
-	public : ChavesPrimarias *ptr;
-			 ListaInvertida *prox;
-	
-};
-
-//Estrutura para armazenar e tratar as chaves secundarias
-//Cada no cria uma lista invertida
-
-class ChavesSecundarias {
-	public : char chaveSec[];
-			 ListaInvertida *Inicio;
-			 ListaInvertida *Fim;
-			 ChavesSecundarias *prox;
+public:
+	ChavesSecundarias* Inicio;
 };
 
 class Lista {
@@ -62,10 +56,9 @@ class Lista {
 class Arquivos{
 public:
 	void ArquivoPrimario();
-private:
-	void LerListaOriginal(std::istream& Lista, std::ostream& indicelista, ChavesPrimarias **no);
+	void InserirPrimario(ChavesPrimarias **no, std::string chave, unsigned RRN, std::ostream& indicelistaP);
+	void InserirSecundario(ChavesSecundarias **no, std::string curso, unsigned RRN, std::ostream& indicelistaS);	
+	void LerListaOriginal(std::istream& Lista, std::ostream& indicelistaP, std::ostream& indicelistaS, ChavesPrimarias **noP, ChavesSecundarias **noS);
 };
-
- 
 
 #endif //LISTA_H
