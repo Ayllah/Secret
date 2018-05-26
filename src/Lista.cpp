@@ -232,10 +232,10 @@ void Arquivos::ArquivoPrimario(){
    LerListaOriginal(Lista1, indicelistaP1, indicelistaS1, &listaPrimarios1->Inicio, &listaInvertida1->Inicio);
 
    // Ler Lista 2 e cria arquivo de indices primarios: indicelista2
-   /*ListaRegistros* listaPrimarios2;
-   ListaInvertida* listaInvertida2;
+   ListaPrimaria *listaPrimarios2 = new ListaPrimaria;
+   ListaInvertida* listaInvertida2 = new ListaInvertida;
    LerListaOriginal(Lista2, indicelistaP2, indicelistaS2, &listaPrimarios2->Inicio, &listaInvertida2->Inicio);
-   */
+   
    Lista1.close();
    Lista2.close();
    indicelistaP1.close();

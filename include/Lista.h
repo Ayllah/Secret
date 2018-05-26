@@ -6,26 +6,27 @@
 
 //Estrutura para armazenar e tratar as chaves primarias
 
-typedef struct ChavesP {
-	std::string chavePrim; 
-	int RRN;
-	char MarcadorAtivo;
-	struct ChavesP *prox;
-}ChavesPrimarias;
+struct ChavesPrimarias {
+	 std::string chavePrim; 
+			unsigned RRN;
+			char MarcadorAtivo;
+			ChavesPrimarias *prox;
+};
 
-class ListaRegistros{
+class ListaPrimaria{
 public:
 	ChavesPrimarias* Inicio;
 };
 
-//Estrutura para armazenar e tratar as chaves secundarias
-//Cada no cria uma lista invertida
-
-typedef struct ChavesS {
+//Estrutura para armazenar e tratar as listas invertidas
+//Para cada no da lista de chaves secundarias sera criada
+//uma lista invertida e será mantido os ponteiros para os
+//nos da lista de chave primaria
+struct ChavesSecundarias {
 	std::string curso;
 	unsigned referencia;
-	struct ChavesS* prox;
-}ChavesSecundarias;
+	ChavesSecundarias* prox;
+};
 
 //Estrutura para armazenar e tratar as listas invertidas
 //Para cada no da lista de chaves secundarias sera criada
@@ -36,6 +37,7 @@ class ListaInvertida {
 public:
 	ChavesSecundarias* Inicio;
 };
+/*
 
 class Lista {
 	public : ChavesPrimarias *ChavPrimInicio, *ChavPrimFim;
@@ -52,7 +54,7 @@ class Lista {
 			 void Intercalacao();
 
 };
-
+*/
 class Arquivos{
 public:
 	void ArquivoPrimario();
@@ -60,5 +62,7 @@ public:
 	void InserirSecundario(ChavesSecundarias **no, std::string curso, unsigned RRN, std::ostream& indicelistaS);	
 	void LerListaOriginal(std::istream& Lista, std::ostream& indicelistaP, std::ostream& indicelistaS, ChavesPrimarias **noP, ChavesSecundarias **noS);
 };
+
+ 
 
 #endif //LISTA_H
