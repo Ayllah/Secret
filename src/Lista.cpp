@@ -1,5 +1,6 @@
 #include "Lista.h"
 
+
 //Cria arquivos quando nao existem
 /*
 //Cria arquivos quando nao existem
@@ -217,7 +218,46 @@ void AtualizarRegistro(){
   tamanhoSecMATRIC = tamanhoVetor;
 }
 */
-void Arquivos::ArquivoPrimario(){
+
+//Retorna o tamanho da lista primaria
+int Arquivos::TamanhoListaPrim(ChavesPrimarias *Inicio) {
+    int i = 0;
+    ChavesPrimarias *iterador = Inicio;
+    while (iterador) {
+        if (iterador->MarcadorAtivo) {
+          i++;
+        }
+        iterador = iterador->prox;
+   }
+    return i;
+}
+
+bool Arquivos::ExcluirRegistroP(ChavesPrimarias **no, std::string chave, std::ostream& indicelistaP){
+  int N = TamanhoListaPrim(*no);
+  for(int i = 0; i < N; i++){
+    if(((*no)->chave).compare(chave) == 0){
+      (*no)->MarcadorAtivo = false;
+      //(*no)->chave = "*";
+      indicelistaP.seekp((*no)->RRN/*, ios_base::beg*/);
+      indicelistaP.put('*');
+      //indicelistaP.close();
+    }
+  }
+  (*no)->MarcadorAtivo = true;
+  return (*no)->MarcadorAtivo;
+}
+
+void Arquivos::Excluir(ListaPrimaria *listaPrimarios1, std::ostream& indicelistaP1){
+  std::string chave;
+  printf("Remover Registro \n\nInsira a Chave a ser removida: ");
+  std::cin >> chave;
+  if(!ExcluirRegistroP(&listaPrimarios1->Inicio,chave,indicelistaP1))
+    printf("Chave Removida");
+  else
+    printf("Erro ao remover chave");
+}
+
+void Arquivos::ArquivoPrimSec(ListaPrimaria *listaPrimarios1, ListaPrimaria* listaPrimarios2, ListaInvertida* listaInvertida1, ListaInvertida* listaInvertida2){
    std::ifstream Lista1("../res/lista1.txt");
    std::ifstream Lista2("../res/lista2.txt");
    std::ofstream indicelistaP1("../res/indicelista1.ind");
@@ -227,14 +267,12 @@ void Arquivos::ArquivoPrimario(){
    std::ofstream indicelistaS2("../res/listaSecundaria2.ind"); 
 
    // Ler Lista1 e cria indicelista1
-   ListaPrimaria *listaPrimarios1 = new ListaPrimaria;
-   ListaInvertida* listaInvertida1 = new ListaInvertida;
-   LerListaOriginal(Lista1, indicelistaP1, indicelistaS1, &listaPrimarios1->Inicio, &listaInvertida1->Inicio);
+   unsigned indice = 0;
+   LerListaOriginal(listaInvertida1, listaPrimarios1, &indice, Lista1, indicelistaP1, indicelistaS1, &listaPrimarios1->Inicio, &listaInvertida1->Inicio, NULL, NULL);
 
    // Ler Lista 2 e cria arquivo de indices primarios: indicelista2
-   ListaPrimaria *listaPrimarios2 = new ListaPrimaria;
-   ListaInvertida* listaInvertida2 = new ListaInvertida;
-   LerListaOriginal(Lista2, indicelistaP2, indicelistaS2, &listaPrimarios2->Inicio, &listaInvertida2->Inicio);
+   indice = 0;
+   LerListaOriginal(listaInvertida2, listaPrimarios2, &indice, Lista2, indicelistaP2, indicelistaS2, &listaPrimarios2->Inicio, &listaInvertida2->Inicio, NULL, NULL);
    
    Lista1.close();
    Lista2.close();
@@ -244,25 +282,34 @@ void Arquivos::ArquivoPrimario(){
    indicelistaS2.close(); 
 }
 
-void Arquivos::InserirSecundario(ChavesSecundarias **no, std::string curso, unsigned RRN, std::ostream& indicelistaS){
-   (*no) = new ChavesSecundarias;
-   (*no)->curso = curso;
-   (*no)->prox = NULL;
-   (*no)->referencia = RRN;
-   indicelistaS << curso << " " << (*no)->referencia << std::endl;   
-}
 
-void Arquivos::InserirPrimario(ChavesPrimarias **no, std::string chave, unsigned RRN, std::ostream& indicelistaP){
+void Arquivos::InserirPrimario(unsigned *indice, ChavesPrimarias **no, ChavesPrimarias *anterior, std::string chave, unsigned RRN, std::string curso, std::ostream& indicelistaP){
    (*no) = new ChavesPrimarias;
-   (*no)->chavePrim = chave;
+   (*no)->chave = chave;
    (*no)->RRN = RRN;
    (*no)->MarcadorAtivo = 1;
    (*no)->prox = NULL;
+   (*no)->indice = (*indice);
+   (*no)->anterior = anterior;
+   (*no)->curso = curso;
+  
    indicelistaP << chave << "|" << (*no)->RRN << std::endl; 
 }
 
-void Arquivos::LerListaOriginal(std::istream& Lista, std::ostream& indicelistaP, std::ostream& indicelistaS,
-                              ChavesPrimarias **noP, ChavesSecundarias **noS){
+void Arquivos::InserirSecundario(ChavesSecundarias **no, ChavesSecundarias *anterior, std::string curso, ChavesPrimarias **chavePrimaria, std::ostream& indicelistaS){
+   (*no) = new ChavesSecundarias;
+   (*no)->curso = curso;
+   (*no)->prox = NULL;
+   (*no)->chavePrimaria = (*chavePrimaria);
+   indicelistaS << curso << " " << (*no)->chavePrimaria->indice << std::endl;   
+}
+
+void Arquivos::LerListaOriginal(ListaInvertida* listaInvertida, ListaPrimaria* listaPrimaria, unsigned *indice, 
+   std::istream& Lista, std::ostream& indicelistaP, 
+   std::ostream& indicelistaS, ChavesPrimarias **noP, 
+   ChavesSecundarias **noS, ChavesSecundarias *anteriorS, 
+   ChavesPrimarias *anteriorP){
+   
    if(!Lista.eof()){
       std::string linha, chave, curso;
       getline(Lista, linha);
@@ -290,11 +337,126 @@ void Arquivos::LerListaOriginal(std::istream& Lista, std::ostream& indicelistaP,
             }
          }
          unsigned RRN = 2*indicelistaP.tellp();
-         InserirPrimario(&(*noP), chave, RRN, indicelistaP);
-         InserirSecundario(&(*noS), curso, RRN, indicelistaS);
-         std::cout << chave << std::endl;
 
-         Arquivos::LerListaOriginal(Lista, indicelistaP, indicelistaS, &((*noP)->prox), &((*noS)->prox));
+         InserirPrimario(&(*indice), &(*noP), anteriorP, chave, RRN, curso, indicelistaP);
+         
+         if((*indice) == 0 || !existeCurso(curso, listaInvertida)){
+            InserirSecundario(&(*noS), anteriorS, curso, &(*noP), indicelistaS);
+            (*indice)++;
+            Arquivos::LerListaOriginal(listaInvertida, listaPrimaria, &(*indice), Lista, indicelistaP, indicelistaS, &((*noP)->prox), &((*noS)->prox), *noS, *noP);
+         }
+         else{
+            (*indice)++;
+            Arquivos::LerListaOriginal(listaInvertida, listaPrimaria, &(*indice), Lista, indicelistaP, indicelistaS, &((*noP)->prox), &(*noS), *noS, *noP);
+         }
       }
+   } 
+}
+
+bool Arquivos::existeCurso(std::string curso, ListaInvertida* lista){
+
+   ChavesSecundarias *atual;
+   bool existe = false;
+   
+   for(atual = lista->Inicio; atual != NULL; atual=atual->prox){
+      if( (atual->curso).compare(curso) == 0 ) 
+         existe = true;
+   }
+   return existe;
+}
+
+void Arquivos::TrocaNoSec(ChavesSecundarias *atual, ChavesSecundarias *proximo){
+   ChavesSecundarias *tmpProx;
+   tmpProx = proximo->prox;
+   proximo->prox = atual->prox;
+   atual->prox = tmpProx;
+
+   ChavesSecundarias *tmpAnterior;
+   tmpAnterior = proximo->anterior;
+   proximo->anterior = atual->anterior;
+   atual->anterior = proximo->anterior;
+}
+
+void Arquivos::OrdenaListaSecundaria(ListaInvertida *lista){
+   ChavesSecundarias *atual;
+   bool trocou = true;
+
+   while(!trocou){
+      trocou = false;
+      for(atual = lista->Inicio; atual != NULL; atual=atual->prox){
+         if( (atual->curso).compare(atual->prox->curso) > 0 ){
+            TrocaNoSec(atual, atual->prox);
+            trocou = true;
+         }
+      }
+   }
+}
+ 
+void Arquivos::TrocaNoPrim(ChavesPrimarias **atual, ChavesPrimarias **proximo){
+   ChavesPrimarias* tmpProx;
+   tmpProx = (*proximo)->prox;
+   (*proximo)->prox = (*atual)->prox;
+   (*atual)->prox = tmpProx;
+
+   ChavesPrimarias* tmpAnterior;
+   tmpAnterior = (*proximo)->anterior;
+   (*proximo)->anterior = (*atual)->anterior;
+   (*atual)->anterior = (*proximo)->anterior;
+}
+
+void Arquivos::OrdenaListaPrimaria(ListaPrimaria **lista, ListaInvertida **invertida){
+   ChavesPrimarias *atual;
+   ChavesSecundarias *aux;
+   bool trocou = true;
+
+   while(!trocou){
+      trocou = false;
+      for(atual = (*lista)->Inicio; atual != NULL; atual=atual->prox){
+         if( (atual->chave).compare(atual->prox->chave) > 0 ){
+            TrocaNoPrim(&atual, &atual->prox);
+            trocou = true;
+         }
+      }
+   }
+
+   aux = (*invertida)->Inicio;
+   while(aux != NULL){
+      for(atual = (*lista)->Inicio; atual->curso != aux->curso; atual=atual->prox);
+      aux->chavePrimaria = atual;
+      aux = aux->prox;  
+   }
+   
+}
+
+void Arquivos::ImprimeSecundaria(ListaInvertida* lista){
+   ChavesSecundarias* atual;
+   ChavesPrimarias* aux;
+   unsigned RRN, indice;
+   std::cout << "\nCurso\t\t" << "Referencia Registro (indice / PRR)" << std::endl;
+   for(atual = lista->Inicio; atual != NULL; atual=atual->prox){
+      indice = atual->chavePrimaria->indice;
+      RRN = atual->chavePrimaria->RRN;
+      std::cout << atual->curso << "\t\t\t" << indice << "/" << RRN;
+
+      for(aux = atual->chavePrimaria->prox; aux != NULL; aux = aux->prox){
+         indice = aux->indice;
+         RRN = aux->RRN;        
+         if( (aux->curso).compare(atual->curso) == 0 )
+            std::cout << ", " << indice << "/" << RRN;
+      }
+      std::cout << "\n";
+   }
+}
+
+void Arquivos::ImprimePrimaria(ListaPrimaria* lista){
+   ChavesPrimarias* atual;
+   std::string RRN, indice, espaco = " ";
+   std::cout << "\nIndice \t\t\tChave\t\t\t\t PRR" << std::endl;
+   for(atual = lista->Inicio; atual != NULL; atual=atual->prox){
+      indice = std::to_string(atual->indice);
+      RRN = std::to_string(atual->RRN);
+      indice.resize(3, espaco[0]);
+      RRN.resize(6, espaco[0]);
+      std::cout << indice << "\t\t" << atual->chave << "\t\t" << RRN << std::endl;
    }
 }
