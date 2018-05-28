@@ -1,0 +1,15 @@
+015511 Angelo Luiz Rocatto Junior               34  CC       B
+031200 Andre Luiz Silva Bezerra                 34  CC       B
+033282 Henrique Elias da Silva                  34  CC       B
+041881 Ana Luisa Costa Miguel                   34  CC       A
+042728 Daniel Alonso Negrini                    34  EC       B
+042865 Danilo Silva Marshall                    35  CC       A
+043341 Fabricio Nallin Violin                   34  EC       A
+045058 Marcio Alexandre Marar Moreno            34  EC       A
+044072 Igor Ribeiro de Assis                    34  CC       B
+045927 Rafael Obregon de Melo                   34  CC       B
+045934 Rafael Pinhate Bandeira                  34  CC       B
+046674 Tharsis Tuani Pinto Souza                37  EM       B
+046946 Vitor Bruno Jacintho de Almeida          34  EC       A
+024312 Leonardo Nunes de Souza                  34  CC       B
+
