@@ -12,23 +12,19 @@ int main(int argc, char const *argv[]){
 
 	arq->ArquivoPrimSec(listaPrimarios1, listaPrimarios2, listaInvertida1, listaInvertida2);
 
-	arq->OrdenaListaPrimaria(&listaPrimarios1, &listaInvertida1);
+	arq->OrdenaListaPrimaria(listaPrimarios1, listaInvertida1);
 	arq->OrdenaListaSecundaria(listaInvertida1);
 
-	arq->OrdenaListaPrimaria(&listaPrimarios2, &listaInvertida2);
-	arq->OrdenaListaSecundaria(listaInvertida2);	
+	arq->OrdenaListaPrimaria(listaPrimarios2, listaInvertida2);
+	arq->OrdenaListaSecundaria(listaInvertida2);
 
-	std::cout << "\nArquivo: lista1.txt" << std::endl;
-	arq->ImprimeSecundaria(listaInvertida1);
-	arq->ImprimePrimaria(listaPrimarios1);
-	std::cout.width(70);
-	std::cout.fill( '_' );
-	std::cout << "_" << std::endl;
+	arq->InsereReferencia(listaPrimarios1, listaInvertida1);
+	arq->InsereReferencia(listaPrimarios2, listaInvertida2);
 
-	std::cout << "\nArquivo: lista2.txt" << std::endl;
-	arq->ImprimeSecundaria(listaInvertida2);
-	arq->ImprimePrimaria(listaPrimarios2);	
+   	//arq->Menu(listaPrimarios1, listaPrimarios2, listaInvertida1, listaInvertida2);
 
 
+	//arq->ImprimeListas(listaPrimarios1, listaPrimarios2, listaInvertida1, listaInvertida2);
+	arq->Excluir(listaPrimarios1, listaInvertida1, listaPrimarios2, listaInvertida2);
 	return 0;
 }

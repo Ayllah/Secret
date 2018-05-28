@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <iomanip>
 
 //Estrutura para armazenar e tratar as chaves primarias
 
@@ -12,9 +13,10 @@ struct ChavesPrimarias {
 	std::string curso;
 	unsigned indice;
 	unsigned RRN;
-	char MarcadorAtivo;
+	bool MarcadorAtivo;
 	ChavesPrimarias *prox;
 	ChavesPrimarias *anterior;
+	ChavesPrimarias *referencia;
 };
 
 class ListaPrimaria{
@@ -62,9 +64,11 @@ class Lista {
 */
 class Arquivos{
 public:
+	void Menu(ListaPrimaria* listaPrimarios1, ListaPrimaria* listaPrimarios2, ListaInvertida* listaInvertida1, ListaInvertida* listaInvertida2);
+
 	int TamanhoListaPrim(ChavesPrimarias *Inicio);
-	bool ExcluirRegistroP(ChavesPrimarias **no, std::string chave, std::ostream& indicelistaP);
-	void Excluir(ListaPrimaria *listaPrimarios1, std::ostream& indicelistaP1);
+	void Excluir(ListaPrimaria* listaP1, ListaInvertida* listaI1, ListaPrimaria* listaP2, ListaInvertida* listaI2);
+	void ExcluirRegistro(ListaPrimaria* listaP, ListaInvertida* listaI, std::string registro, std::fstream& indicelistaP, std::fstream& indicelistaS);
 
 	void ArquivoPrimSec(ListaPrimaria *listaPrimarios1, ListaPrimaria* listaPrimarios2, ListaInvertida* listaInvertida1, ListaInvertida* listaInvertida2);
 	void LerListaOriginal(ListaInvertida* listaInvertida, ListaPrimaria* listaPrimaria, unsigned *indice, std::istream& Lista, std::ostream& indicelistaP, std::ostream& indicelistaS, ChavesPrimarias **noP, ChavesSecundarias **noS, ChavesSecundarias *anteriorS, ChavesPrimarias *anteriorP);
@@ -77,10 +81,14 @@ public:
 	void TrocaNoSec(ChavesSecundarias *atual, ChavesSecundarias *proximo);
 	void OrdenaListaSecundaria(ListaInvertida *lista);
 	void TrocaNoPrim(ChavesPrimarias **atual, ChavesPrimarias **proximo);
-	void OrdenaListaPrimaria(ListaPrimaria **lista, ListaInvertida** invertida);
+	void OrdenaListaPrimaria(ListaPrimaria *lista, ListaInvertida* invertida);
 
 	void ImprimeSecundaria(ListaInvertida* lista);
 	void ImprimePrimaria(ListaPrimaria* lista);
+	void ImprimeListas(ListaPrimaria* listaPrimarios1, ListaPrimaria* listaPrimarios2, ListaInvertida* listaInvertida1, ListaInvertida* listaInvertida2);
+
+
+	void InsereReferencia(ListaPrimaria *listaP, ListaInvertida *listaS);
 };
 
  

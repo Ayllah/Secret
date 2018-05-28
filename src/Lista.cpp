@@ -1,5 +1,6 @@
 #include "Lista.h"
 
+using namespace std;
 
 //Cria arquivos quando nao existem
 /*
@@ -232,29 +233,62 @@ int Arquivos::TamanhoListaPrim(ChavesPrimarias *Inicio) {
     return i;
 }
 
-bool Arquivos::ExcluirRegistroP(ChavesPrimarias **no, std::string chave, std::ostream& indicelistaP){
-  int N = TamanhoListaPrim(*no);
-  for(int i = 0; i < N; i++){
-    if(((*no)->chave).compare(chave) == 0){
-      (*no)->MarcadorAtivo = false;
-      //(*no)->chave = "*";
-      indicelistaP.seekp((*no)->RRN/*, ios_base::beg*/);
-      indicelistaP.put('*');
-      //indicelistaP.close();
-    }
-  }
-  (*no)->MarcadorAtivo = true;
-  return (*no)->MarcadorAtivo;
+void Arquivos::ExcluirRegistro(ListaPrimaria* listaP, ListaInvertida* listaI, std::string registro, 
+   std::fstream& indicelistaP, std::fstream& indicelistaS){
+   
+   string chaveParaExcluir, linha, rrn;
+   unsigned contador=0, espacos=0;
+   int RRN;
+
+   // Concatena o registro: matricula + nome
+   while( (chaveParaExcluir.size() < 30) && (espacos <= 5) ){
+      if( !isspace(registro[contador]) ){
+         chaveParaExcluir.push_back(registro[contador]);
+      }
+      else espacos++;
+      contador++;
+   }
+
+   ChavesPrimarias* atualP;
+   while(!indicelistaP.eof()){
+      getline(indicelistaP, linha);
+      string chave = linha.substr(0, 29);
+
+      if(chave.compare(chaveParaExcluir) == 0){
+
+         for(int i = 31; !isspace(linha[i]); i++)
+            rrn.push_back(linha[i]);
+      cout << rrn << endl;
+      std::string::size_type sz;
+      RRN = stoi(rrn);
+      cout << RRN << endl;
+      break;
+      }
+         
+   }
+   
+
+   //cout << RRN << endl;
 }
 
-void Arquivos::Excluir(ListaPrimaria *listaPrimarios1, std::ostream& indicelistaP1){
-  std::string chave;
-  printf("Remover Registro \n\nInsira a Chave a ser removida: ");
-  std::cin >> chave;
-  if(!ExcluirRegistroP(&listaPrimarios1->Inicio,chave,indicelistaP1))
-    printf("Chave Removida");
-  else
-    printf("Erro ao remover chave");
+void Arquivos::Excluir(ListaPrimaria* listaP1, ListaInvertida* listaI1, ListaPrimaria* listaP2, ListaInvertida* listaI2){
+   cout << "\nInsira o Registro que queira excluir (conforme modelo de entrada)" << endl;
+   string registro;
+   getline(cin, registro);
+   cout << "\nQual o nome do arquivo o qual obtem esse registro (lista1.txt ou lista2.txt)?" << endl;
+   string arquivo;
+   getline(cin, arquivo);
+
+   if(arquivo.compare("lista1.txt") == 0){
+      fstream indicelistaP("../res/indicelista1.ind");
+      fstream indicelistaS("../res/listaSecundaria1.ind");
+      ExcluirRegistro(listaP1, listaI1, registro, indicelistaP, indicelistaS);
+   }
+   else if(arquivo.compare("lista2.txt") == 0){
+      fstream indicelistaP("../res/indicelista2.ind");
+      fstream indicelistaS("../res/listaSecundaria2.ind");
+      ExcluirRegistro(listaP1, listaI1, registro, indicelistaP, indicelistaS);      
+   }
 }
 
 void Arquivos::ArquivoPrimSec(ListaPrimaria *listaPrimarios1, ListaPrimaria* listaPrimarios2, ListaInvertida* listaInvertida1, ListaInvertida* listaInvertida2){
@@ -316,7 +350,7 @@ void Arquivos::LerListaOriginal(ListaInvertida* listaInvertida, ListaPrimaria* l
 
       unsigned contador=0, espacos=0;
 
-      while( (chave.size() < 30) && (espacos <= 4) ){
+      while( (chave.size() < 30) && (espacos <= 5) ){
          if( !isspace(linha[contador]) ){
             chave.push_back(linha[contador]);
          }
@@ -393,25 +427,61 @@ void Arquivos::OrdenaListaSecundaria(ListaInvertida *lista){
 }
  
 void Arquivos::TrocaNoPrim(ChavesPrimarias **atual, ChavesPrimarias **proximo){
+   ( (*atual)->chave ).swap( (*proximo)->chave );
+   ( (*atual)->curso ).swap( (*proximo)->curso );
+
+   unsigned tmp;
+   tmp = (*atual)->indice;
+   (*atual)->indice = (*proximo)->indice;
+   (*proximo)->indice = tmp;
+
+   tmp = (*atual)->RRN;
+   (*atual)->RRN = (*proximo)->RRN;
+   (*proximo)->RRN = tmp; 
+
+   bool tmpB = (*atual)->MarcadorAtivo;
+   (*atual)->MarcadorAtivo = (*proximo)->MarcadorAtivo;
+   (*proximo)->MarcadorAtivo = tmpB;
+
+   ChavesPrimarias *aux = (*atual)->referencia;
+   (*atual)->referencia = (*proximo)->referencia;
+   (*proximo)->referencia = aux;
+   
+   /*
    ChavesPrimarias* tmpProx;
-   tmpProx = (*proximo)->prox;
-   (*proximo)->prox = (*atual)->prox;
-   (*atual)->prox = tmpProx;
+   if((*proximo)->prox == NULL) {
+      (*proximo)->prox =  (*atual)->prox;
+      (*atual)->prox = NULL;
+   }
+   else {
+      tmpProx = (*proximo)->prox;
+      (*proximo)->prox = (*atual)->prox;
+      (*atual)->prox = (*proximo)->prox;
+   }
 
    ChavesPrimarias* tmpAnterior;
-   tmpAnterior = (*proximo)->anterior;
-   (*proximo)->anterior = (*atual)->anterior;
-   (*atual)->anterior = (*proximo)->anterior;
+   if((*atual)->anterior == NULL) {
+      (*atual)->anterior =  (*proximo)->anterior;
+      (*proximo)->anterior = NULL;
+   }
+   else {
+      tmpAnterior = (*proximo)->anterior;
+      (*proximo)->anterior = (*atual)->anterior;
+      (*atual)->anterior = (*proximo)->anterior;
+   }
+   */
 }
 
-void Arquivos::OrdenaListaPrimaria(ListaPrimaria **lista, ListaInvertida **invertida){
+void Arquivos::OrdenaListaPrimaria(ListaPrimaria *lista, ListaInvertida *invertida){
    ChavesPrimarias *atual;
    ChavesSecundarias *aux;
+   atual = lista->Inicio;
+   ChavesPrimarias *teste;
    bool trocou = true;
 
-   while(!trocou){
+   while(trocou){
       trocou = false;
-      for(atual = (*lista)->Inicio; atual != NULL; atual=atual->prox){
+      for(atual = lista->Inicio; atual->prox != NULL; atual=atual->prox){
          if( (atual->chave).compare(atual->prox->chave) > 0 ){
             TrocaNoPrim(&atual, &atual->prox);
             trocou = true;
@@ -419,44 +489,115 @@ void Arquivos::OrdenaListaPrimaria(ListaPrimaria **lista, ListaInvertida **inver
       }
    }
 
-   aux = (*invertida)->Inicio;
-   while(aux != NULL){
-      for(atual = (*lista)->Inicio; atual->curso != aux->curso; atual=atual->prox);
-      aux->chavePrimaria = atual;
-      aux = aux->prox;  
+   /*(*aux) = (*invertida)->Inicio;
+   while((*aux) != NULL){
+      for((*atual) = lista->Inicio; (*atual)->curso != (*aux)->curso; (*atual)=(*atual)->prox);
+      (*aux)->chavePrimaria = (*atual);
+      (*aux) = (*aux)->prox;  
    }
-   
+   */
 }
 
 void Arquivos::ImprimeSecundaria(ListaInvertida* lista){
    ChavesSecundarias* atual;
    ChavesPrimarias* aux;
    unsigned RRN, indice;
-   std::cout << "\nCurso\t\t" << "Referencia Registro (indice / PRR)" << std::endl;
+   std::cout << "\nCurso\t\t" << "Primeiro Registro (Referencia / PRR)" << std::endl;
    for(atual = lista->Inicio; atual != NULL; atual=atual->prox){
       indice = atual->chavePrimaria->indice;
       RRN = atual->chavePrimaria->RRN;
-      std::cout << atual->curso << "\t\t\t" << indice << "/" << RRN;
-
-      for(aux = atual->chavePrimaria->prox; aux != NULL; aux = aux->prox){
-         indice = aux->indice;
-         RRN = aux->RRN;        
-         if( (aux->curso).compare(atual->curso) == 0 )
-            std::cout << ", " << indice << "/" << RRN;
-      }
-      std::cout << "\n";
+      std::cout << atual->curso << "\t\t\t" << indice << "/" << RRN << endl;
    }
 }
 
 void Arquivos::ImprimePrimaria(ListaPrimaria* lista){
    ChavesPrimarias* atual;
-   std::string RRN, indice, espaco = " ";
-   std::cout << "\nIndice \t\t\tChave\t\t\t\t PRR" << std::endl;
+   std::string indiceRef, indice, espaco = " ";
+   std::cout << "\nReferencia \t\t\tChave|PRR\t\t Próxima Referencia" << std::endl;
    for(atual = lista->Inicio; atual != NULL; atual=atual->prox){
+      if(atual->referencia != NULL){
+         indiceRef = std::to_string(atual->referencia->indice);
+         indiceRef.resize(6, espaco[0]);
+      }
+      else indiceRef = "-1";
+
       indice = std::to_string(atual->indice);
-      RRN = std::to_string(atual->RRN);
       indice.resize(3, espaco[0]);
-      RRN.resize(6, espaco[0]);
-      std::cout << indice << "\t\t" << atual->chave << "\t\t" << RRN << std::endl;
+      std::cout << indice << "\t\t" << atual->chave << "|" << atual->RRN << "\t\t" << indiceRef << std::endl;
    }
+}
+
+void Arquivos::InsereReferencia(ListaPrimaria *listaP, ListaInvertida *listaS){
+   ChavesSecundarias *noS = listaS->Inicio;
+   while(noS != NULL){
+      ChavesPrimarias *noP, *auxP;
+      for(noP = listaP->Inicio; noP != NULL; noP = noP->prox){
+         if( (noP->curso).compare(noS->curso) == 0){
+            auxP = noP;
+            break;
+         }
+      }
+      for(noP = auxP; noP != NULL; noP = noP->prox){
+         if( (noP->curso).compare(noS->curso) == 0){
+            auxP->referencia = noP;
+            noP->referencia = NULL;
+            auxP = noP;
+         }
+      }
+      noS = noS->prox;
+   }
+}
+
+void Arquivos::ImprimeListas(ListaPrimaria* listaPrimarios1, ListaPrimaria* listaPrimarios2,
+   ListaInvertida* listaInvertida1, ListaInvertida* listaInvertida2){
+   ImprimeSecundaria(listaInvertida1);
+   ImprimePrimaria(listaPrimarios1);
+   std::cout.width(70);
+   std::cout.fill( '_' );
+   std::cout << "_" << std::endl;
+
+   std::cout << "\nArquivo: lista2.txt" << std::endl;
+   ImprimeSecundaria(listaInvertida2);
+   ImprimePrimaria(listaPrimarios2);   
+}
+
+void Arquivos::Menu(ListaPrimaria* listaPrimarios1, ListaPrimaria* listaPrimarios2,
+   ListaInvertida* listaInvertida1, ListaInvertida* listaInvertida2){
+   int opcao;
+   while(true){
+      cout <<endl<<endl;
+      cout <<"\t\t**************************************************"<<endl;
+      cout <<"\t\t"<<"*"<<setw(17)<<""<<setw(13)<<"MENU INDICES"<<setw(18)<<""<<"*"<<endl;
+      cout <<"\t\t**************************************************"<<endl;
+      cout <<"\t\t"<<"*"<<"\t"<<"OPÇÃO:"<<"\t\t"<<"DESCRIÇÃO:"<<"\t\t"<<" *"<<endl;
+      cout <<"\t\t"<<"*""------------------------------------------------"<<"*"<<endl;
+      cout <<"\t\t"<<"*"<<"\t"<<"[1]"<<"\t"<<"Mostrar INDICES"<<"\t\t\t"<<" *"<<endl;
+      cout <<"\t\t"<<"*"<<"\t"<<"[2]"<<"\t"<<"Incluir REGRISTRO"<<"\t\t"<<" *"<<endl;
+      cout <<"\t\t"<<"*"<<"\t"<<"[3]"<<"\t"<<"Excluir REGISTRO"<<"\t\t"<<" *"<<endl;
+      cout <<"\t\t"<<"*"<<"\t"<<"[4]"<<"\t"<<"Atualizar REGISTRO"<<"\t\t"<<" *"<<endl;
+      cout <<"\t\t"<<"*"<<"\t"<<"[5]"<<"\t"<<"Intercalar INDICES"<<"\t\t"<<" *"<<endl;
+      cout <<"\t\t"<<"*"<<"\t"<<"[0]"<<"\t"<<"SAIR"<<"\t\t\t\t"<<" *"<<endl;
+      cout <<"\t\t**************************************************"<<endl;
+      cout <<"\t\t"<<setw(10)<<"Digite sua opção---> ";
+    cin >> opcao;
+    switch(opcao){
+      case 1: 
+           ImprimeListas(listaPrimarios1, listaPrimarios2, listaInvertida1, listaInvertida2);
+           break;
+      case 2:
+         break;
+      case 3:
+         break;
+      case 4:
+         break;
+      case 5:
+         break;
+      case 0: 
+         cout <<"\n\tVocê saiu do programa!\n";
+         exit(0);
+         break;
+      default:
+         cout <<"\n\tDigite uma opção válida!\n";
+    }
+  }
 }
