@@ -6,6 +6,7 @@
 #include <string>
 #include <iomanip>
 #include <vector>
+#include <tuple>
 
 //Estrutura para armazenar e tratar as chaves primarias
 
@@ -65,11 +66,10 @@ class Lista {
 */
 class Arquivos{
 public:
-	void Menu(ListaPrimaria* listaPrimarios1, ListaPrimaria* listaPrimarios2, ListaInvertida* listaInvertida1, ListaInvertida* listaInvertida2);
+	void Menu(Arquivos* arq, ListaPrimaria* listaPrimarios1, ListaPrimaria* listaPrimarios2, ListaInvertida* listaInvertida1, ListaInvertida* listaInvertida2);
 
-	int TamanhoListaPrim(ChavesPrimarias *Inicio);
-	void Excluir(ListaPrimaria* listaP1, ListaInvertida* listaI1, ListaPrimaria* listaP2, ListaInvertida* listaI2);
-	void ExcluirRegistro(ListaPrimaria* listaP, ListaInvertida* listaI, std::string registro, std::fstream& indicelistaP, std::fstream& indicelistaS);
+	void Excluir();
+	void ExcluirRegistro(std::string registro, std::fstream& Lista, std::fstream& indicelistaP, std::fstream& indicelistaP2, std::fstream& indicelistaS);
 
 	void ArquivoPrimSec(ListaPrimaria *listaPrimarios1, ListaPrimaria* listaPrimarios2, ListaInvertida* listaInvertida1, ListaInvertida* listaInvertida2);
 	void LerListaOriginal(ListaInvertida* listaInvertida, ListaPrimaria* listaPrimaria, unsigned *indice, std::istream& Lista, std::ostream& indicelistaP, std::ostream& indicelistaS, ChavesPrimarias **noP, ChavesSecundarias **noS, ChavesSecundarias *anteriorS, ChavesPrimarias *anteriorP);
@@ -85,9 +85,10 @@ public:
 	void ImprimeSecundaria(ListaInvertida* lista);
 	void ImprimePrimaria(ListaPrimaria* lista);
 	void ImprimeListas(ListaPrimaria* listaPrimarios1, ListaPrimaria* listaPrimarios2, ListaInvertida* listaInvertida1, ListaInvertida* listaInvertida2);
-	void Intercalar(std::string lista1, std::string lista2);
+	void Intercalar();
 
 	void InsereReferencia(std::string listaP, std::string listaS, std::string lista);
+	std::tuple<std::string, std::string, std::string> encontraDados(std::string linha, std::istream& Lista);
 };
 
  

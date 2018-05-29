@@ -18,17 +18,14 @@ int main(int argc, char const *argv[]){
 	arq->OrdenaLista("../res/indicelista2.ind");
 	arq->OrdenaLista("../res/indicelista1.ind");
 
-	arq->Intercalar("../res/lista1.txt", "../res/lista2.txt");
+	arq->InsereReferencia("indicelista1", "listaSecundaria1", "../res/lista1.txt");
+	arq->InsereReferencia("indicelista2", "listaSecundaria2", "../res/lista2.txt");
 
-	//arq->InsereReferencia("../res/indicelista1.ind", "listaSecundaria1", "../res/lista1.txt");
-	//arq->InsereReferencia(indicelistaP2, indicelistaS2, indicelista2S2, lista2);
-
-   	//arq->Menu(listaPrimarios1, listaPrimarios2, listaInvertida1, listaInvertida2);
-
-	//indicelistaP1.open("../res/indicelista1.ind");
-	//indicelistaP2.open("../res/indicelista2.ind");	
+	//arq->Intercalar();
+   	arq->Menu(arq, listaPrimarios1, listaPrimarios2, listaInvertida1, listaInvertida2);
+	
 	//arq->ImprimeListas(listaPrimarios1, listaPrimarios2, listaInvertida1, listaInvertida2);
-	//arq->Excluir(listaPrimarios1, listaInvertida1, listaPrimarios2, listaInvertida2);
+	//arq->Excluir();
 	
 	//indicelistaP1.close();
 	//indicelistaP2.close();

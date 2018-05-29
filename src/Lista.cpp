@@ -2,243 +2,12 @@
 
 using namespace std;
 
-//Cria arquivos quando nao existem
-/*
-//Cria arquivos quando nao existem
-void Lista :: CriaRegistro(){
-   FILE *arquivo;
-   arquivo = fopen("lista1.txt", "rb");
-   if(!arquivo){
-      arquivo = fopen("lista1.txt", "wb");
-      fclose(arquivo);
-   }
-   arquivo = fopen("lista2.txt", "rb");
-   if(!arquivo){
-      arquivo = fopen("lista2.txt", "wb");
-      fprintf(arquivo, "i = n");
-      fclose(arquivo);
-   }
-}
-//Insere as chaves primarias nos indices de forma ordenada.
-//Caso nao houver o valor da chave primaria que se queria inserir
-//a funcao ira retornar o endereco do no em que esta alocada a chave
-ChavesPrimarias* Lista :: IncluirRegistroChavP(char *chavePrim, int RRN, ChavesPrimarias **Inicio, ChavesPrimarias **Fim){
-   ChavesPrimarias *no, *iterador, *anterior;
-   no = new(ChavesPrimarias);
-   strcpy(no->chavePrim, chavePrim);
-   no->RRN = RRN;
-   no->MarcadorAtivo = 1;
-   no->prox = NULL;
-   //Verifica se a lista esta vazia
-   if (!*Inicio) {
-       *Inicio = no;
-       *Fim = no;
-   }
-   else {
-         iterador = *Inicio;
-         anterior = *Inicio;
-         while (iterador) {
-            if (strcmp(iterador->chavePrim, chavePrim) == 0) {
-               return iterador;
-            }
-            if (strcmp(iterador->chavePrim, chavePrim) >= 0) {
-               break;
-            }
-            anterior = iterador;
-            iterador = iterador->prox;
-         }
-         if (iterador==NULL) {
-            (*Fim)->prox = no;
-            *Fim = no;
-         }
-         else if (iterador == anterior) {
-            no->prox = iterador;
-            *Inicio = no;
-         }
-         else {
-            anterior->prox = no;
-            no->prox = iterador;
-         }
-   }
-   return node;
-}
-//Insere os elementos na lista invertida de forma ordenada
-void IncluirRegistroInvertida(ChavesPrimarias *ptr, ListaInvertida **Inicio, ListaInvertida **Fim){
-   ListaInvertida *no, *iterador, *anterior;
-   no = new (ListaInvertida);
-   no->ptr = ptr;
-   no->prox = NULL;
-   //Verifica se a lista esta vazia
-   if (!*Inicio) {
-      *Inicio = no;
-         *Fim = no;
-    }
-    else {
-      iterador = *Inicio;
-      ante = *Inicio;
-      while (iterador) {
-         if (strcmp(iterador->pk->key, pk->key)>=0) {
-               break;
-         }
-         ante = iterador;
-         iterador = iterador->prox;
-      }
-      if (iterador==NULL) {
-         (*Fim)->prox = no;
-         *Fim = no;
-      }
-      else if (iterador==ante) {
-         no->prox = iterador;
-         *Inicio = no;
-      }
-      else {
-         ante->prox = no;
-         no->prox = iterador;
-      }
-   }
-}
-//Insere as chaves secundarias nos indices de forma ordenada
-void IncluirRegistroChavS(char *chaveSec, ChavesPrimarias *ptr, ChavesSecundarias **Inicio, ChavesSecundarias **Fim){
-   ChavesSecundarias *no, *iterador, *anterior;
-    no = new (ChavesSecundarias);
-    strcpy(no->chaveSec, chaveSec);
-    no->prox = NULL;
-    no->Inicio = NULL;
-    no->Fim = NULL;
-    //Verifica se a lista esta vazia
-    if (!*Inicio) {
-       *Inicio = no;
-       *Fim = no;
-      // Inserindo elementos na lista invertida
-      IncluirRegistroInvertida(ptr, &((*Inicio)->Inicio), &((*Inicio)->Fim));
-         return;
-    }
-    else {
-      iterador = *Incio;
-      anterior = *Inicio;
-      while (iterador) {
-         if (strcmp(iterador->chaveSec, chaveSec) == 0) {
-               free(no);
-               //Inserindo elementos na lista invertida
-               IncluirRegistroInvertida(ptr, &(iterador->Incio), &(iterador->Fim));
-               return;
-         }
-         if (strcmp(iterador->chaveSec, chaveSec) > 0) {
-            break;
-            }
-         anterior = iterador;
-         iterador = iterador->prox;
-      }
-      if (iterador == NULL) {
-         (*Fim)->prox = no;
-         *Fim = no;
-      }
-      else if (iterador == anterior) {
-         no->prox = iterador;
-         *Incio = no;
-      }
-      else {
-         anterior->prox = no;
-         no->prox = iterador;
-      }
-         //Inserindo elementos na lista invertida
-      IncluirRegistroInvertida(ptr, &(no->Incio), &(no->Fim));
-   }
-}
-//Retorna o tamanho da lista primaria
-int TamanhoListaPrim(ChavesPrimarias *Inicio) {
-    int i = 0;
-    ChavesPrimarias *iterador = Inicio;
-    while (iterador) {
-        if (iterador->MarcadorAtivo) {
-          i++;
-        }
-        iterador = iterador->prox;
-   }
-    return i;
-}
-//Retorna o tamanho da lista secundaria
-int TamanhoListaSec(ChavesSecundarias *Inicio){
-   int i = 0;
-   ChavesSecundarias *iterador = Inicio;
-   while(iterador) {
-       i++;
-       iterador = iterador->prox;
-   }
-   return i;
-}
-//Percorre o arquivo com base no RRN e adiciona uma marca
-//de exclusao (*) e desetiva o respectivo no
-void ExcluirRegistro(ChavesPrimarias *no){
-  no->MarcadorAtivo = 0;
-  FILE *arquivo;
-  arquivo = fopen("lista1.txt", "r+b");
-  fseek(arquivo, no->RRN, SEEK_SET);
-  fputc('*', arquivo);
-  fclose(arquivo);
-}
-//Cria um vetor a partir de uma lista ligada e a percorre.
-ChavesSecundarias** ListaParaVetorSec(ChavesSecundarias *Incio) {
-    int i, n;
-    ChavesSecundarias **elementos;
-    n = TamanhoListaSec(Incio);
-    elementos = new(ChavesSecundarias);
-    for (i = 0; i < n; i++) {
-        elementos[i] = Incio;
-        Incio = Incio->prox;
-    }
-    tamanhoVetor = n;
-    return elementos;
-}
-//Cria um vetor a partir de uma lista ligada e a percorre.
-ChavesPrimarias** ListaParaVetorPrim(ChavesPrimarias *Inicio) {
-    int i, n;
-    ChavesPrimarias **elementos;
-    n = TamanhoListaPrim(Inicio);
-    elementos = new(ChavesPrimarias);
-    for (i = 0; i < n; i++) {
-        while (!(Inicio->MarcadorAtivo)) {
-          Inicio = Inicio->prox;
-        }
-        elementos[i] = Inicio;
-        Inicio = Inicio->prox;
-    }
-    tamanhoVetor = n;
-    return elementos;
-}
-//Atualiza o tamanho dos indices e recria os vetores
-void AtualizarRegistro(){
-  free(vetorSecNOME);
-  free(vetorSecMATRIC);
-  free(vetorP);
-  vetorP = ListaParaVetorPrim(ChavPrimInicio);
-  tamanhoPrim = tamanhoVetor;
-  vetorSecNOME = ListaParaVetorSec(ChavSecMATInicio);
-  tamanhoSecNOME = tamanhoVetor;
-  vetorSecMATRIC = ListaParaVetorSec(ChavSecNOMEInicio);
-  tamanhoSecMATRIC = tamanhoVetor;
-}
-*/
-
-//Retorna o tamanho da lista primaria
-int Arquivos::TamanhoListaPrim(ChavesPrimarias *Inicio) {
-    int i = 0;
-    ChavesPrimarias *iterador = Inicio;
-    while (iterador) {
-        if (iterador->MarcadorAtivo) {
-          i++;
-        }
-        iterador = iterador->prox;
-   }
-    return i;
-}
-
-void Arquivos::ExcluirRegistro(ListaPrimaria* listaP, ListaInvertida* listaI, std::string registro, 
-   std::fstream& indicelistaP, std::fstream& indicelistaS){
+void Arquivos::ExcluirRegistro(std::string registro, std::fstream& Lista, std::fstream& indicelistaP, std::fstream& indicelistaP2, std::fstream& indicelistaS){
    
-   string chaveParaExcluir, linha, espaco = " ", rrn;
+   string chaveParaExcluir, linha, rrn;
    unsigned contador=0, espacos=0;
-   int RRN;
+   int RRN, RRN_P;
+   bool excluido = false;
 
    // Concatena o registro: matricula + nome
    while( (chaveParaExcluir.size() < 30) && (espacos <= 5) ){
@@ -251,54 +20,69 @@ void Arquivos::ExcluirRegistro(ListaPrimaria* listaP, ListaInvertida* listaI, st
 
    if(chaveParaExcluir.size() < 30){
       while(chaveParaExcluir.size() < 30){
-         chaveParaExcluir.push_back(espaco[0]);
+         chaveParaExcluir.push_back(' ');
       }
    }   
-
-   ChavesPrimarias* atualP;
+   getline(indicelistaP, linha);
    while(!indicelistaP.eof()){
-      getline(indicelistaP, linha);
       string chave = linha.substr(0, 30);
       if(chave.compare(chaveParaExcluir) == 0){
-         contador = 31;
+         int contador = 31;
          while(!isspace(linha[contador])){
-            rrn.push_back(linha[contador]);
+               rrn.push_back(linha[contador]);
             contador++;
          }
-      
-         RRN = stoi(rrn);
-         indicelistaP.seekp(RRN/*, ios_base::beg*/);
+         string liinha;
+         int RRN = stoi(rrn);
+         Lista.seekp(RRN);
+         Lista << "*                                                 ";
+         Lista << "            ";
+
+         RRN_P = indicelistaP.tellg();
+         indicelistaP.seekp(RRN_P - 41);
          indicelistaP << "*                             ";
+         excluido = true;
 
          string curso;
          curso.push_back(registro[52]);
          curso.push_back(registro[53]);
          
          while(!indicelistaS.eof()){
-            string linhaS, cursoArq;
+            string linhaS, linhaSS, cursoSec, referenciaInd;
             getline(indicelistaS, linhaS);
-            cursoArq = linhaS.substr(0, 2);
-            string referenciaInd = linhaS.substr(3, 9);
+            linhaSS.replace(0, linhaS.size(), linhaS);
+            cursoSec = linhaS.substr(0, 2);
+            for(int i=3; i<12; i++) referenciaInd.push_back(linhaS[i]);
 
-            if(curso.compare(cursoArq) == 0){
-               string referencia = linha.substr(62, 9);
+            if(curso.compare(cursoSec) == 0){
+               string referencia = linha.substr(31, 9);
+               
                if(referencia.compare(referenciaInd) == 0){
-                  indicelistaS.ignore(2, indicelistaS.eof());
-                  indicelistaS << referencia << endl;
-               }
+                  int posicao = indicelistaP.tellg();
+                  indicelistaP2.seekg(posicao+1);
+                  string novoRRN;
+                  getline(indicelistaP2, novoRRN);
+                  
+                  posicao = indicelistaS.tellg();
+                  indicelistaS.seekg(posicao - 10);
+                  indicelistaS << novoRRN;
+               }              
             }
          }
+         RRN_P = indicelistaP.tellg();
+         indicelistaP2.seekg(RRN_P - 30);
+         indicelistaP2 << "*                             ";          
          break;
       }
-         
+      getline(indicelistaP, linha);  
    }
-   
-
-   //cout << RRN << endl;
+   if(!excluido) 
+      cout << "\n Não existe esse registo!\n" << endl;
 }
 
-void Arquivos::Excluir(ListaPrimaria* listaP1, ListaInvertida* listaI1, ListaPrimaria* listaP2, ListaInvertida* listaI2){
-   cout << "\nInsira o Registro que queira excluir (conforme modelo de entrada)" << endl;
+void Arquivos::Excluir(){
+   cout << "\nInsira o Registro que queira excluir (conforme modelo de entrada), exemplo:" << endl;
+   cout << "031147 Anderson Silva Bezerra                   34  EC       B\n" << endl;
    string registro;
    getline(cin, registro);
    cout << "\nQual o nome do arquivo o qual obtem esse registro (lista1.txt ou lista2.txt)?" << endl;
@@ -307,14 +91,20 @@ void Arquivos::Excluir(ListaPrimaria* listaP1, ListaInvertida* listaI1, ListaPri
 
    if(arquivo.compare("lista1.txt") == 0){
       fstream indicelistaP("../res/indicelista1.ind");
+      fstream indicelistaP2("../res/indicelista1-2.ind");
       fstream indicelistaS("../res/listaSecundaria1.ind");
-      ExcluirRegistro(listaP1, listaI1, registro, indicelistaP, indicelistaS);
+      fstream Lista("../res/lista1.txt");
+      ExcluirRegistro(registro, Lista, indicelistaP, indicelistaP2, indicelistaS);
    }
    else if(arquivo.compare("lista2.txt") == 0){
       fstream indicelistaP("../res/indicelista2.ind");
+      fstream indicelistaP2("../res/indicelista2-2.ind");
       fstream indicelistaS("../res/listaSecundaria2.ind");
-      ExcluirRegistro(listaP1, listaI1, registro, indicelistaP, indicelistaS);      
+      fstream Lista("../res/lista2.txt");
+      ExcluirRegistro(registro, Lista, indicelistaP, indicelistaP2, indicelistaS);      
    }
+   else
+      cout << "Não foi digitado arquivo válido!" << endl;
 }
 
 void Arquivos::ArquivoPrimSec(ListaPrimaria *listaPrimarios1, ListaPrimaria* listaPrimarios2, ListaInvertida* listaInvertida1, ListaInvertida* listaInvertida2){
@@ -361,7 +151,7 @@ void Arquivos::InserirSecundario(ChavesSecundarias **no, ChavesSecundarias *ante
    (*no)->curso = curso;
    (*no)->prox = NULL;
    (*no)->chavePrimaria = (*chavePrimaria);
-   indicelistaS << curso << "|" << (*no)->chavePrimaria->RRN << std::endl;   
+   indicelistaS << curso << std::endl;   
 }
 
 void Arquivos::LerListaOriginal(ListaInvertida* listaInvertida, ListaPrimaria* listaPrimaria, unsigned *indice, 
@@ -372,6 +162,7 @@ void Arquivos::LerListaOriginal(ListaInvertida* listaInvertida, ListaPrimaria* l
    
    if(!Lista.eof()){
       std::string linha, chave, curso;
+      int rrn = Lista.tellg();
       getline(Lista, linha);
 
       unsigned contador=0, espacos=0;
@@ -393,7 +184,6 @@ void Arquivos::LerListaOriginal(ListaInvertida* listaInvertida, ListaPrimaria* l
                chave.push_back(' ');
             }
          }
-         int rrn = Lista.tellg();
          string RRN = to_string(rrn);
 
          if(RRN.size() < 9){
@@ -481,54 +271,103 @@ void Arquivos::ImprimeSecundaria(ListaInvertida* lista){
 
 void Arquivos::ImprimePrimaria(ListaPrimaria* lista){
    ChavesPrimarias* atual;
-   std::string indiceRef, indice, espaco = " ";
+   std::string indiceRef, indice;
    std::cout << "\nReferencia \t\t\tChave|PRR\t\t Próxima Referencia" << std::endl;
    for(atual = lista->Inicio; atual != NULL; atual=atual->prox){
       if(atual->referencia != NULL){
          indiceRef = std::to_string(atual->referencia->indice);
-         indiceRef.resize(6, espaco[0]);
+         indiceRef.resize(6, ' ');
       }
       else indiceRef = "-1";
 
       indice = std::to_string(atual->indice);
-      indice.resize(3, espaco[0]);
+      indice.resize(3, ' ');
       std::cout << indice << "\t\t" << atual->chave << "|" << atual->RRN << "\t\t" << indiceRef << std::endl;
    }
 }
 
-/*void Arquivos::InsereReferencia(string listaP, string listaS, string lista){
-   string name = "../res/" + listaS + ".ind";
-   string name2 = "../res/" + listaS + "1.ind";
-   ofstream indicelista1S(name2.c_str());
-   ofstream indicelistaS(name.c_str()); 
-   istream indicelistaP(listaP.c_str());
-   istream Lista(lista.c_str());    
-   bool Primeiro = true;
-   string linha;
-   getline(indicelistaP, linha);  
+void Arquivos::InsereReferencia(string listaP, string listaS, string lista){
+   string nameS = "../res/" + listaS + ".ind";
+   string nameP11 = "../res/" + listaP + "-2.ind";
+   string nameP = "../res/" + listaP + ".ind";
+   ofstream indicelista11(nameP11.c_str());
+   fstream indicelistaS(nameS.c_str()); 
+   fstream indicelistaP;
+   ifstream Lista(lista.c_str());    
+   bool temProx = false;
+   string linha, curso;
+   vector<string> indSec;
+   string ultimoDaLista;
+   string curso2, RRN2, chave2;
+   string cursoPrimario, RRN, chave;
 
-   while(!listaP.eof() && linha.size() != 0){
-      string curso = encontraCurso(linha, indicelistaP);
-      indicelistaP.ignore(2);
+   getline(indicelistaS, linha);  
 
-      getline(indicelistaP, linha);  
-      while(){
+   while(!indicelistaS.eof() && linha.size() != 0){
+   
+      curso = linha.substr(0, 2);
+      indicelistaP.open(nameP.c_str());
 
-      }
-   }
+      getline(indicelistaP, linha); 
+
+      while(!indicelistaP.eof() && linha.size() != 0){
+         tuple<string, string> reg;
+         tie(cursoPrimario, RRN, chave) = encontraDados(linha, Lista);
+         ultimoDaLista = linha.substr(0, linha.size());
+
+         if(curso.compare(cursoPrimario) == 0){
+            string linha2;
+            getline(indicelistaP, linha2);
+
+            while(!indicelistaP.eof() && linha2.size() != 0){
+               tuple<string, string, string> reg2;
+               tie(curso2, RRN2, chave2) = encontraDados(linha2, Lista);
+               temProx = false;
+
+               if(curso.compare(curso2) == 0){
+                  indicelista11 << chave << "|" << RRN2 << endl;
+                  temProx = true;
+                  linha.swap(linha2);
+                  chave.swap(chave2);
+               }
+               ultimoDaLista = linha2.substr(0, linha2.size());
+               getline(indicelistaP, linha2);
+            }
+            string secundario = curso + "|" + RRN;
+            indSec.push_back(secundario);
+
+            if(!temProx)
+            indicelista11 << chave << "|-1       " << endl;                
+            break;
+         }
+         getline(indicelistaP, linha);
+      }    
       indicelistaP.close();
-      Lista.close();
-      indicelista1S << "\n";
-      curso.clear();
-      getline(indicelistaS, curso);     
+      getline(indicelistaS, linha);
+   }
+   tie(curso2, RRN2, chave2) = encontraDados(ultimoDaLista, Lista);
+   indicelista11 << chave2 << "|-1       " << endl;
+
+   int i=0;
+   indicelistaS.close();
+   indicelistaS.open(nameS.c_str());
+   while(i < indSec.size()){
+      indicelistaS << indSec[i] << endl;
+      i++;
+
    }
 
    indicelistaS.close();
-   indicelista1S.close();
+   indicelista11.close();
+   Lista.close();
+   OrdenaLista(nameP11);
 }
 
-string encontraCurso(string linha, ostream& Lista){
-   string rrn;
+tuple<string, string, string> Arquivos::encontraDados(string linha, istream& Lista){
+   string rrn, chave;
+   for(int i=0; i<30; i++){
+      chave.push_back(linha[i]);
+   }
    int contador = 31;
    while(!isspace(linha[contador])){
       rrn.push_back(linha[contador]);
@@ -538,14 +377,18 @@ string encontraCurso(string linha, ostream& Lista){
    int RRN = stoi(rrn);
 
    string registro;
-   Lista.seekp(RRN);
+   Lista.seekg(RRN);
    getline(Lista, registro);
    string cursoIndP;
    cursoIndP.push_back(registro[52]);
    cursoIndP.push_back(registro[53]);
-   return cursoIndP;
+
+   while(rrn.size() != 9){
+      rrn.push_back(' ');
+   }
+   return make_tuple(cursoIndP, rrn, chave);
 }
-*/
+
 void Arquivos::ImprimeListas(ListaPrimaria* listaPrimarios1, ListaPrimaria* listaPrimarios2,
    ListaInvertida* listaInvertida1, ListaInvertida* listaInvertida2){
    ImprimeSecundaria(listaInvertida1);
@@ -559,7 +402,7 @@ void Arquivos::ImprimeListas(ListaPrimaria* listaPrimarios1, ListaPrimaria* list
    ImprimePrimaria(listaPrimarios2);   
 }
 
-void Arquivos::Menu(ListaPrimaria* listaPrimarios1, ListaPrimaria* listaPrimarios2,
+void Arquivos::Menu(Arquivos *arq, ListaPrimaria* listaPrimarios1, ListaPrimaria* listaPrimarios2,
    ListaInvertida* listaInvertida1, ListaInvertida* listaInvertida2){
    int opcao;
    while(true){
@@ -580,15 +423,17 @@ void Arquivos::Menu(ListaPrimaria* listaPrimarios1, ListaPrimaria* listaPrimario
     cin >> opcao;
     switch(opcao){
       case 1: 
-           ImprimeListas(listaPrimarios1, listaPrimarios2, listaInvertida1, listaInvertida2);
-           break;
+         arq->ImprimeListas(listaPrimarios1, listaPrimarios2, listaInvertida1, listaInvertida2);
+         break;
       case 2:
          break;
       case 3:
+         arq->Excluir();
          break;
       case 4:
          break;
       case 5:
+         arq->Intercalar();
          break;
       case 0: 
          cout <<"\n\tVocê saiu do programa!\n";
@@ -601,42 +446,108 @@ void Arquivos::Menu(ListaPrimaria* listaPrimarios1, ListaPrimaria* listaPrimario
 }
 
 
-void Arquivos::Intercalar(string lista1, string lista2){
-   ifstream Lista1(lista1.c_str());
-   ifstream Lista2(lista2.c_str());
-
-   string linha1;
-   string linha2;
+void Arquivos::Intercalar(){
+   ifstream Lista1("../res/lista1.txt");
+   ifstream Lista2("../res/lista2.txt");
+   ifstream indicelista1("../res/indicelista1.ind");
+   ifstream indicelista2("../res/indicelista2.ind");
    ofstream Lista12("../res/Lista12.txt");
 
+   string linha1, linha2, rrn, rrn1, rrn2, linha, chave1, chave2;
+   int RRN, contador=31;;
+
    cout << "\n LISTAS 1 E 2 INTERCALADAS:\n" << endl;
-   while(!Lista1.eof() && !Lista2.eof()){
-      getline(Lista1, linha1);
-      getline(Lista2, linha2);
-      if(linha1.compare(linha2) < 0){
-         Lista12 << linha1 << endl;
-         getline(Lista1, linha1);
-         cout << linha1 << endl;
-      }    
+   getline(indicelista1, linha1);
+   getline(indicelista2, linha2);  
+   for(int i=0; i<30; i++){
+      chave1.push_back(linha1[i]);
+   }
+   for(int i=0; i<30; i++){
+      chave2.push_back(linha2[i]);
+   }   
+   while(!isspace(linha[contador])){
+      rrn1.push_back(linha1[contador]);
+      contador++;
+   }
+   contador=31;
+   while(!isspace(linha[contador])){
+      rrn2.push_back(linha2[contador]);
+      contador++;
+   }   
+
+   while(!indicelista1.eof() && !indicelista2.eof()){
+      if(chave1.compare(chave2) < 0){
+         RRN = stoi(rrn1);         
+         Lista1.seekg(RRN);
+         getline(Lista1, linha);
+
+         Lista12 << linha << endl;
+         cout << linha << endl;
+         contador=31;
+         rrn1.clear();
+         chave1.clear();
+         getline(indicelista1, linha1);
+         for(int i=0; i<30; i++)
+            chave1.push_back(linha1[i]);
+
+         while(!isspace(linha1[contador]))
+            rrn1.push_back(linha1[contador++]);
+      } 
+
       else{
-         Lista12 << linha2 << endl;
-         getline(Lista2, linha2);
-         cout << linha2 << endl;
+         RRN = stoi(rrn2);         
+         Lista2.seekg(RRN);
+         getline(Lista2, linha);
+
+         Lista12 << linha << endl;
+         cout << linha << endl;
+         contador=31;
+         rrn2.clear();
+         chave2.clear();
+         getline(indicelista2, linha2);
+         for(int i=0; i<30; i++)
+            chave2.push_back(linha2[i]);
+         
+         while(!isspace(linha2[contador]))
+            rrn2.push_back(linha2[contador++]);    
       }
    }
-   while(!Lista1.eof()){
-      getline(Lista1, linha1);
-      Lista12 << linha1 << endl;
-      getline(Lista1, linha1);
-      cout << linha1 << endl;
+   contador=31;
+   while(!indicelista1.eof()){
+      
+      while(!isspace(linha1[contador])){
+            rrn.push_back(linha1[contador]);
+            contador++;
+         }
+      int RRN = stoi(rrn);         
+      Lista1.seekg(RRN);
+      getline(Lista1, linha); 
+
+      Lista12 << linha << endl;
+      cout << linha << endl;
+      contador=31;
+      rrn.clear();
+      getline(indicelista1, linha1);
    }
-   while(!Lista2.eof()){
-      getline(Lista2, linha2);
-      Lista12 << linha2 << endl;
-      getline(Lista2, linha2);
-      cout << linha2 << endl;
+   while(!indicelista2.eof()){
+
+      while(!isspace(linha2[contador])){
+         rrn.push_back(linha2[contador]);
+         contador++;
+      }
+      int RRN = stoi(rrn);         
+      Lista2.seekg(RRN);
+      getline(Lista2, linha);      
+      
+      Lista12 << linha << endl;
+      cout << linha << endl;
+      contador=31;
+      rrn.clear();      
+      getline(indicelista2, linha2);
    }
-   Lista12.close();
    Lista1.close();
    Lista2.close();
+   Lista12.close();
+   indicelista1.close();
+   indicelista2.close();
 }
