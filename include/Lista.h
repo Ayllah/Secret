@@ -66,7 +66,7 @@ class Lista {
 */
 class Arquivos{
 public:
-	void Menu(Arquivos* arq, ListaPrimaria* listaPrimarios1, ListaPrimaria* listaPrimarios2, ListaInvertida* listaInvertida1, ListaInvertida* listaInvertida2);
+	void Menu(ListaPrimaria* listaPrimarios1, ListaPrimaria* listaPrimarios2, ListaInvertida* listaInvertida1, ListaInvertida* listaInvertida2);
 
 	void Excluir();
 	void ExcluirRegistro(std::string registro, std::fstream& Lista, std::fstream& indicelistaP, std::fstream& indicelistaP2, std::fstream& indicelistaS);
@@ -84,11 +84,19 @@ public:
 
 	void ImprimeSecundaria(ListaInvertida* lista);
 	void ImprimePrimaria(ListaPrimaria* lista);
-	void ImprimeListas(ListaPrimaria* listaPrimarios1, ListaPrimaria* listaPrimarios2, ListaInvertida* listaInvertida1, ListaInvertida* listaInvertida2);
+	void ImprimeListas(int opcao);
 	void Intercalar();
 
 	void InsereReferencia(std::string listaP, std::string listaS, std::string lista);
 	std::tuple<std::string, std::string, std::string> encontraDados(std::string linha, std::istream& Lista);
+	void OrganizarAquivos();
+
+	void Atualizar();
+	void AtualizarNome(std::fstream& indicelistaP, std::fstream& indicelistaP2, std::fstream& Lista, std::string registro);
+	void AtualizarMatricula(std::fstream& indicelistaP, std::fstream& indicelistaP2, std::fstream& Lista, std::string registro);
+	void AtualizarOpcao(std::fstream& Lista, std::string registro);
+	void AtualizarTurma(std::fstream& Lista, std::string registro);
+	void AtualizarCurso(std::fstream& Lista, std::fstream& listaS, std::fstream& listaP2, std::string registro, std::string nome);
 };
 
  
