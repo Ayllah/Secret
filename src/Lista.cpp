@@ -9,7 +9,7 @@ void Arquivos::ExcluirRegistro(std::string registro, std::fstream& Lista, std::f
    int RRN, RRN_P;
    bool excluido = false;
 
-   // Concatena o registro: matricula + nome
+   // Cria chave: Concatena o registro: matricula + nome
    while( (chaveParaExcluir.size() < 30) && (espacos <= 5) ){
       if( !isspace(registro[contador]) ){
          chaveParaExcluir.push_back(registro[contador]);
@@ -18,20 +18,24 @@ void Arquivos::ExcluirRegistro(std::string registro, std::fstream& Lista, std::f
       contador++;
    }
 
-   if(chaveParaExcluir.size() < 30){
+   if(chaveParaExcluir.size() < 30){ // fixa tamanho da chave a ser comparada
       while(chaveParaExcluir.size() < 30){
          chaveParaExcluir.push_back(' ');
       }
    }   
    getline(indicelistaP, linha);
+
+   // Verifica as chaves do Arq de Indices Primarios
+   // Quando encontrar, calcula PRR para entao excluir no Arq Orignal
    while(!indicelistaP.eof()){
       string chave = linha.substr(0, 30);
       if(chave.compare(chaveParaExcluir) == 0){
          int contador = 31;
          while(!isspace(linha[contador]))
-               rrn.push_back(linha[contador++]);
+               rrn.push_back(linha[contador++]); // calcula PRR
          
          int RRN = stoi(rrn);
+         // Sobrescreve Arq sinalizando a exclusão com um *
          Lista.seekp(RRN);
          Lista << "*                                                 ";
          Lista << "            ";
@@ -44,7 +48,10 @@ void Arquivos::ExcluirRegistro(std::string registro, std::fstream& Lista, std::f
          string curso;
          curso.push_back(registro[52]);
          curso.push_back(registro[53]);
-         
+         // Verifica se o curso do registro excluido corresponde ao
+         // primeiro da lista de secundarios
+         // Se for o primeiro, atualiza o curso sobrescrevendo o
+         // curso proximo da lista (informação dada pelo arq da lista Invertida)
          while(!indicelistaS.eof()){
             string linhaS, linhaSS, cursoSec, referenciaInd;
             getline(indicelistaS, linhaS);
@@ -96,7 +103,8 @@ void Arquivos::Excluir(){
       indicelistaP.close();
       indicelistaP2.close();
       indicelistaS.close();
-      Lista.close();      
+      Lista.close();
+      ImprimeListas(1);
    }
    else if(arquivo.compare("lista2.txt") == 0){
       fstream indicelistaP("../res/indicelista2.ind");
@@ -107,7 +115,8 @@ void Arquivos::Excluir(){
       indicelistaP.close();
       indicelistaP2.close();
       indicelistaS.close();
-      Lista.close();           
+      Lista.close();  
+      ImprimeListas(2);
    }
    else
       cout << "Não foi digitado arquivo válido!" << endl; 
@@ -369,6 +378,7 @@ tuple<string, string, string> Arquivos::encontraDados(string linha, istream& Lis
 void Arquivos::ImprimeListas(int opcao){
    string linha;
    ifstream indicelistaP, indicelistaP2, indicelistaS, Lista;
+   // Verifica qual arquivo .txt será manipulado, assim como suas listas de indices
     if(opcao == 1){
       indicelistaP.open("../res/indicelista1.ind");
       indicelistaP2.open("../res/indicelista1-2.ind");
@@ -404,7 +414,6 @@ void Arquivos::ImprimeListas(int opcao){
    }
 
    cout << "\nlista1.txt" << endl;
-   cout << "Curso|PRR (primeiro chave que contém o curso)" << endl;
    while(!Lista.eof()){
       getline(Lista, linha);
       cout << linha << endl;
@@ -418,7 +427,8 @@ void Arquivos::ImprimeListas(int opcao){
 
 void Arquivos::Menu(ListaPrimaria* listaPrimarios1, ListaPrimaria* listaPrimarios2,
    ListaInvertida* listaInvertida1, ListaInvertida* listaInvertida2){
-   int opcao;
+   string opcao;
+   int op;
    while(true){
       cout <<endl<<endl;
       cout <<"\t\t**************************************************"<<endl;
@@ -434,13 +444,15 @@ void Arquivos::Menu(ListaPrimaria* listaPrimarios1, ListaPrimaria* listaPrimario
       cout <<"\t\t"<<"*"<<"\t"<<"[0]"<<"\t"<<"SAIR"<<"\t\t\t\t"<<" *"<<endl;
       cout <<"\t\t**************************************************"<<endl;
       cout <<"\t\t"<<setw(10)<<"Digite sua opção---> ";
-    cin >> opcao;
-    switch(opcao){
+      getline(cin, opcao);
+      op = stoi(opcao);
+    switch(op){
       case 1: 
          this->ImprimeListas(1);
          this->ImprimeListas(2);
          break;
       case 2:
+         this->InserirRegistro();
          break;
       case 3:
          this->Excluir();
@@ -461,8 +473,11 @@ void Arquivos::Menu(ListaPrimaria* listaPrimarios1, ListaPrimaria* listaPrimario
   }
 }
 
-
-void Arquivos::Intercalar(){
+// Algoritmo semelhante ao MergeSort, modificado para comparar strings
+// O Merge é calculado usando os Arq de Indice Primarios
+// Escolhida a string, é calculado o PRR do registro correspondente
+// Posiciona Arq Original no registro, lê e escreve no novo Arquivo
+void Arquivos::Intercalar(){ 
    ifstream Lista1("../res/lista1.txt");
    ifstream Lista2("../res/lista2.txt");
    ifstream indicelista1("../res/indicelista1.ind");
@@ -492,43 +507,48 @@ void Arquivos::Intercalar(){
    }   
 
    while(!indicelista1.eof() && !indicelista2.eof()){
-      if(chave1.compare(chave2) < 0){
-         RRN = stoi(rrn1);         
-         Lista1.seekg(RRN);
-         getline(Lista1, linha);
+      if(chave1.compare(chave2) < 0){ // compara chaves
+         RRN = stoi(rrn1); // calcula PRR do registro no Arq Original
+         Lista1.seekg(RRN); // posiciona no registro correspondente
+         getline(Lista1, linha); // captura (lê) registro
 
-         Lista12 << linha << endl;
+         Lista12 << linha << endl; // escreve no novo arquivo
          cout << linha << endl;
+         // reatuliza auxiliares para ficarem prontos a serem usados novamente
          contador=31;
          rrn1.clear();
          chave1.clear();
          getline(indicelista1, linha1);
          for(int i=0; i<30; i++)
-            chave1.push_back(linha1[i]);
+            chave1.push_back(linha1[i]); // captura nova chave
 
          while(!isspace(linha1[contador]))
-            rrn1.push_back(linha1[contador++]);
+            rrn1.push_back(linha1[contador++]); // captura novo PRR
       } 
 
       else{
-         RRN = stoi(rrn2);         
-         Lista2.seekg(RRN);
-         getline(Lista2, linha);
+         RRN = stoi(rrn2); // calcula PRR do registro no Arq Original
+         Lista2.seekg(RRN); // posiciona no registro correspondente
+         getline(Lista2, linha); // captura (lê) registro
 
-         Lista12 << linha << endl;
+         Lista12 << linha << endl; // escreve no novo arquivo
          cout << linha << endl;
+         // reatuliza auxiliares para ficarem prontos a serem usados novamente
          contador=31;
          rrn2.clear();
          chave2.clear();
          getline(indicelista2, linha2);
          for(int i=0; i<30; i++)
-            chave2.push_back(linha2[i]);
+            chave2.push_back(linha2[i]); // captura nova chave
          
          while(!isspace(linha2[contador]))
-            rrn2.push_back(linha2[contador++]);    
+            rrn2.push_back(linha2[contador++]); // captura novo PRR
       }
    }
    contador=31;
+   // Escreve em sequencia as chaves que sobraram
+   // Seguindo a mesma logica anterior de pegar o PRR
+   // Le registro correspondente a chave e escrevendo no novo Arquivo
    while(!indicelista1.eof()){
       
       while(!isspace(linha1[contador])){
@@ -824,6 +844,10 @@ void Arquivos::AtualizarCurso(fstream& Lista, fstream& listaS, fstream& listaP2,
    listaS.open(nomeArq);
 }
 
+// Ordena Arquivos de Indices Primarios e Secundarios
+// Cria Lista Invertida: indicelista1-2.ind ou indicelista2-2.ind
+// Que contém as chaves, seguidas dos PRR da proxima chave que contem o 
+// mesmo curso (de forma ordenada). 
 void Arquivos::OrganizarAquivos(){
    this->OrdenaLista("../res/listaSecundaria1.ind");
    this->OrdenaLista("../res/listaSecundaria2.ind");
@@ -833,4 +857,102 @@ void Arquivos::OrganizarAquivos(){
 
    this->InsereReferencia("indicelista1", "listaSecundaria1", "../res/lista1.txt");
    this->InsereReferencia("indicelista2", "listaSecundaria2", "../res/lista2.txt");
+}
+
+void Arquivos::InserirRegistro(){
+   string arquivo, registro, chave, RRN, nomeLista, nomeIndice;
+   string nomeSec, linha, curso, cursoS;
+   int i=0, rrn, posicao, contador=0, opcao;
+   bool temEspaco = false, existeCurso = false;
+   fstream Lista, indicelistaP, listaSecundaria;
+   cout << "Digite os registro que queira excluir (como no modelo)" << endl;
+   getline(cin, registro);
+   cout << "\nDigite o nome do arquivo em que deseja incluir" << endl;
+   getline(cin, arquivo);
+   
+   if(arquivo.compare("lista1.txt") == 0){
+      nomeLista = "../res/lista1.txt";
+      nomeIndice = "../res/indicelista1.ind";
+      nomeSec = "../res/listaSecundaria1.ind";
+      opcao = 1;
+   }
+   if(arquivo.compare("lista2.txt") == 0){
+      nomeLista = "../res/lista2.txt";
+      nomeIndice = "../res/indicelista2.ind";
+      nomeSec = "../res/listaSecundaria2.ind";
+      opcao = 2;
+   }   
+
+   indicelistaP.open(nomeIndice.c_str());
+   Lista.open(nomeLista.c_str());
+   // Cria chave do registro
+   while(chave.size() < 30 && contador < registro.size()){
+      if(!isspace(registro[i])) chave.push_back(registro[i]);
+      i++;
+      contador++;
+   }
+   // Captura curso correspondente
+   if(chave.size() < 30) while(chave.size() < 30) chave.push_back(' ');
+   curso.push_back(registro[52]);
+   curso.push_back(registro[53]);
+
+   getline(indicelistaP, linha);
+   // Se linha conter * (espaço disponivel), insere nova chave no lugar
+   // Insere no Arquivo Original no lugar correspondente
+   while(!indicelistaP.eof() && linha.size()!=0){
+      if(linha[0] == '*'){
+         posicao = indicelistaP.tellg();
+         indicelistaP.seekp(posicao-41);
+
+         indicelistaP << chave;
+         cout << chave << "*" << endl;
+         temEspaco = true;
+         RRN = linha.substr(31, 9);
+
+         int pos = stoi(RRN);
+         Lista.seekp(pos);
+         Lista << registro;
+         break;
+      }
+      getline(indicelistaP, linha);
+   }
+   indicelistaP.close();
+   Lista.close();
+   // Caso não tenha espaço disponivel, insere no fim dos arquivos
+   if(!temEspaco){
+      indicelistaP.open(nomeIndice.c_str(), ios::app);
+      Lista.open(nomeLista.c_str(), ios::app);
+      rrn = Lista.tellg();
+      rrn = rrn - 64;
+      
+      RRN = to_string(rrn);
+      while(RRN.size() < 9)  RRN.push_back(' ');
+      indicelistaP << chave << "|" << RRN << endl;
+      Lista << registro << endl;
+      indicelistaP.close();
+      Lista.close(); 
+   }
+
+   // Verifica se curso existe na lista Secundaria. Se nao existir, insere na lista
+   listaSecundaria.open(nomeSec.c_str());
+   getline(listaSecundaria, linha);
+
+   while(!listaSecundaria.eof() && linha.size() != 0){
+      cursoS = linha.substr(0, 2);
+      if(cursoS.compare(curso) == 0){
+         existeCurso = true;
+         break;
+      }
+      getline(listaSecundaria, linha);
+   }
+   listaSecundaria.close();
+   listaSecundaria.open(nomeSec.c_str(), ios::app);
+   if(!existeCurso){
+      listaSecundaria << curso << "|" << RRN << endl;
+   }
+   listaSecundaria.close();
+
+   // Organiza novamente os arquivos (Ordenando e Organziando a Lista Invertida)
+   OrganizarAquivos();
+   ImprimeListas(opcao);
 }

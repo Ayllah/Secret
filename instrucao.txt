@@ -1,0 +1,27 @@
+Título: Trabalho 01 - Organização de Arquivos
+Autoras: 
+Ayllah Ahmad Lopes 170056465
+Hevelyn Sthefany   170059031
+
+Descrição do Projeto:
+Este programa tem por objetivo realizar algumas operações em Arquivos. Representando e manipulando arquivos e seus índices.
+
+COMPILAÇÃO E EXECUÇÃO:
+Inicialmente deverá ser dado "make" no diretório "src" para que o programa seja compilado
+O comando para executar o programa no prompt:
+	./main
+
+Saídas:
+Todos os arquivos, inclusice os novos gerados pelo programa irão ser salvos no diretório "res" contido no diretório do programa. Este diretório irá conter os seguintes arquivos:
+	lista1.txt e lista2.txt: arquivos que serão manipulados
+	lista12.txt: arquivo com os arquivos lista1.txt e lista2.txt ordenados e intercalados por ordem de chave
+	indicelista1.ind: arquivo de índices primários simples da lista1
+	indicelista2.ind: arquivo de índices primários simples da lista2
+	listaSecundaria1.ind: arquivo de índices secundários da lista1
+	listaSecundaria2.ind: arquivo de índices secundários da lista2
+	indicelista1-2.ind: arquivos de índices primários simples da lista1 com PRR da próxima chave que contém o mesmo curso de forma ordenada
+	indicelista2-2.ind: arquivos de índices primários simples da lista2 com PRR da próxima chave que contém o mesmo curso de forma ordenada
+	As funções de Incluir, Excluir e Atualizar irão modificar os arquivos já existentes.
+	A cada vez que o programa for recompilado, novos arquivos de índices serão criados.
+
+	Todas as funções de Ordenação, Impressão, Inserção, Exclusão, Atualização e criação da lista Invertda são feitas com manipulações de arquivo (sem usar estrutura de dados lista).

@@ -71,13 +71,14 @@ public:
 	void Excluir();
 	void ExcluirRegistro(std::string registro, std::fstream& Lista, std::fstream& indicelistaP, std::fstream& indicelistaP2, std::fstream& indicelistaS);
 
+	void InserirRegistro();
+
 	void ArquivoPrimSec(ListaPrimaria *listaPrimarios1, ListaPrimaria* listaPrimarios2, ListaInvertida* listaInvertida1, ListaInvertida* listaInvertida2);
 	void LerListaOriginal(ListaInvertida* listaInvertida, ListaPrimaria* listaPrimaria, unsigned *indice, std::istream& Lista, std::ostream& indicelistaP, std::ostream& indicelistaS, ChavesPrimarias **noP, ChavesSecundarias **noS, ChavesSecundarias *anteriorS, ChavesPrimarias *anteriorP);
 	
 	void InserirPrimario(unsigned *indice, ChavesPrimarias **no, ChavesPrimarias *anterior, std::string chave, std::string RRN, std::string curso, std::ostream& indicelistaP);
 	void InserirSecundario(ChavesSecundarias **no, ChavesSecundarias *anterior, std::string curso, ChavesPrimarias **chavePrimaria, std::ostream& indicelistaS, std::string RRN);
 	bool existeCurso(std:: string curso, ListaInvertida *lista);
-	void Insere_proxOrdem(ListaPrimaria* lista, ChavesPrimarias** no, std::string curso);
 
 	void OrdenaLista(std::string nomeArquivo);
 	void insertion_sort(std::vector<std::string>& vetor);
